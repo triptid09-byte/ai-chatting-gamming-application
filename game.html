@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLULU - Game Hub</title>
+    <link rel="shortcut icon" href="img/hoshinologo.png" type="image/x-icon" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gradient-to-br from-[#0f0c1b] via-[#F9E4E8] to-[#E8E8FF] min-h-screen text-gray-800 flex flex-col justify-center items-center relative font-sans px-4 py-16 selection:bg-pink-200">
+    
+    <!-- Back Button -->
+    <a href="index.html" class="absolute top-6 left-6 text-gray-500 hover:text-gray-900 bg-white/60 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center shadow-sm backdrop-blur transition-all duration-300 group" aria-label="Go Back">
+        <i class="fa-solid fa-arrow-left text-lg transition-transform group-hover:-translate-x-0.5"></i>
+    </a>
+
+    <!-- Top Right Dropdown Menu Container -->
+    <div class="absolute top-6 right-6 z-50">
+        <button id="menuBtn"
+            class="bg-white/80 backdrop-blur-md text-gray-700 px-4 py-2.5 rounded-full shadow-sm hover:shadow border border-pink-100/50 hover:bg-white transition-all flex items-center gap-2 font-medium"
+            aria-haspopup="true">
+            <i class="fa-solid fa-bars text-pink-500"></i>
+            <span class="text-sm hidden sm:inline">Menu</span>
+        </button>
+        <div id="dropdown"
+            class="hidden absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-pink-100/80 overflow-hidden origin-top-right transition-all duration-200 divide-y divide-pink-50">
+            <a href="front.html" class="px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition flex items-center gap-3 font-medium text-sm">
+                <i class="fa-solid fa-home text-pink-400 w-5 text-center"></i> Home
+            </a>
+            <a href="chat.html" class="px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition flex items-center gap-3 font-medium text-sm">
+                <i class="fa-solid fa-comments text-pink-400 w-5 text-center"></i> Chat
+            </a>
+            <a href="videocall.html" class="px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition flex items-center gap-3 font-medium text-sm">
+                <i class="fa-solid fa-video text-pink-400 w-5 text-center"></i> Video Call
+            </a>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <div class="text-center mb-12 max-w-xl">
+        <h3 class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-800 via-purple-500 to-pink-600 drop-shadow-sm mb-3">
+            THE LOBBY IS OPEN
+        </h3>
+        <p class="text-gray-800 font-medium text-sm sm:text-base">Select an arena below and challenge your skills 🎮🖥️</p>
+    </div>
+
+    <!-- Main Responsive Games Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-7xl px-4">
+
+        <!-- Game Card: Tic Tac Toe -->
+        <a href="tictectoe.html" class="group bg-white/60 backdrop-blur-md rounded-3xl p-5 border border-white/40 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-300 flex flex-col justify-between items-center text-center transform hover:-translate-y-1">
+            <div class="w-full aspect-square flex items-center justify-center bg-pink-50/50 rounded-2xl mb-6 overflow-hidden p-4">
+                <img src="img/tictactoe.png" alt="Tic Tac Toe Thumbnail"
+                    class="max-h-full max-w-full object-contain filter drop-shadow-[0_8px_16px_rgba(244,63,94,0.15)] transition-transform duration-300 group-hover:scale-105">
+            </div>
+            <div class="w-full bg-white/90 border border-pink-100 text-gray-800 py-3 px-6 rounded-2xl shadow-sm group-hover:bg-pink-500 group-hover:text-white group-hover:border-pink-500 transition-all duration-300 flex items-center justify-center gap-2 font-bold tracking-wide text-base">
+                <span>TIC TAC TOE</span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-60 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+        </a>
+
+        <!-- Game Card: Bubble Shooter -->
+        <a href="bubbleshooter.html" class="group bg-white/60 backdrop-blur-md rounded-3xl p-5 border border-white/40 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-300 flex flex-col justify-between items-center text-center transform hover:-translate-y-1">
+            <div class="w-full aspect-square flex items-center justify-center bg-pink-50/50 rounded-2xl mb-6 overflow-hidden p-4">
+                <img src="img/bubble.png" alt="Bubble Shooter Thumbnail"
+                    class="max-h-full max-w-full object-contain filter drop-shadow-[0_8px_16px_rgba(244,63,94,0.15)] transition-transform duration-300 group-hover:scale-105">
+            </div>
+            <div class="w-full bg-white/90 border border-pink-100 text-gray-800 py-3 px-6 rounded-2xl shadow-sm group-hover:bg-pink-500 group-hover:text-white group-hover:border-pink-500 transition-all duration-300 flex items-center justify-center gap-2 font-bold tracking-wide text-base">
+                <span>BUBBLE SHOOTER</span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-60 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+        </a>
+
+        <!-- Game Card: Wool Untangle -->
+        <a href="wool.html" class="group bg-white/60 backdrop-blur-md rounded-3xl p-5 border border-white/40 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-300 flex flex-col justify-between items-center text-center transform hover:-translate-y-1">
+            <div class="w-full aspect-square flex items-center justify-center bg-pink-50/50 rounded-2xl mb-6 overflow-hidden p-4">
+                <img src="img/WOOL.jpg" alt="Wool Untangle Thumbnail"
+                    class="max-h-full max-w-full object-cover rounded-xl filter drop-shadow-[0_8px_16px_rgba(244,63,94,0.15)] transition-transform duration-300 group-hover:scale-105">
+            </div>
+            <div class="w-full bg-white/90 border border-pink-100 text-gray-800 py-3 px-6 rounded-2xl shadow-sm group-hover:bg-pink-500 group-hover:text-white group-hover:border-pink-500 transition-all duration-300 flex items-center justify-center gap-2 font-bold tracking-wide text-base">
+                <span>WOOL UNTANGLE</span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-60 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+        </a>
+
+        <!-- Game Card: 2048 -->
+        <a href="2048game.html" class="group bg-white/60 backdrop-blur-md rounded-3xl p-5 border border-white/40 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-300 flex flex-col justify-between items-center text-center transform hover:-translate-y-1">
+            <div class="w-full aspect-square flex items-center justify-center bg-pink-50/50 rounded-2xl mb-6 overflow-hidden p-4">
+                <img src="img/2048.png" alt="2048 Game Thumbnail"
+                    class="max-h-full max-w-full object-contain filter drop-shadow-[0_8px_16px_rgba(244,63,94,0.15)] transition-transform duration-300 group-hover:scale-105">
+            </div>
+            <div class="w-full bg-white/90 border border-pink-100 text-gray-800 py-3 px-6 rounded-2xl shadow-sm group-hover:bg-pink-500 group-hover:text-white group-hover:border-pink-500 transition-all duration-300 flex items-center justify-center gap-2 font-bold tracking-wide text-base">
+                <span>2048</span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-60 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- Dropdown Script -->
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdown = document.getElementById('dropdown');
+
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Close menu if clicking outside anywhere on screen
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
