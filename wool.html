@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wool String Puzzle</title>
+     <link rel="shortcut icon" href="img\hoshinologo.png" type="image/x-icon" />
+    <style>
+        :root {
+            --bg-color: #1a1528;
+            --panel-bg: #2d2244;
+            --accent-success: #00ffcc;
+            --accent-tangled: #ff4757;
+            --text-color: #f3f0ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-wrapper {
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            position: relative;
+        }
+
+        .header-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 500px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+        }
+
+        .level-badge {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            background: #110d1c;
+            border: 3px solid #4a376e;
+            border-radius: 12px;
+            cursor: grab;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            background: #563d82;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #6f51a3;
+        }
+
+        .hint {
+            font-size: 14px;
+            color: #a296bd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <div class="header-panel">
+            <h1>WOOL UNTANGLE</h1>
+            <div class="level-badge" id="levelDisplay">LEVEL 1</div>
+        </div>
+
+        <canvas id="puzzleCanvas" width="500" height="500"></canvas>
+
+        <div class="controls">
+            <span class="hint">Drag nodes to untangle the overlapping wool threads!</span>
+            <button class="btn" id="resetBtn">Reset Level</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('puzzleCanvas');
+        const ctx = canvas.getContext('2d');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Node Pin Configurations
+        const NODE_RADIUS = 14;
+        let nodes = [];
+        let connections = [];
+        let selectedNode = null;
+        let currentLevel = 0;
+
+        // Level Coordinates Data Mapping
+        const levels = [
+            // Level 1: Simple Cross (4 Nodes)
+            {
+                nodes: [{x: 150, y: 150}, {x: 350, y: 150}, {x: 150, y: 350}, {x: 350, y: 350}],
+                connections: [[0, 3], [1, 2], [0, 1], [2, 3]]
+            },
+            // Level 2: Hexagram Knot (5 Nodes)
+            {
+                nodes: [{x: 250, y: 100}, {x: 380, y: 220}, {x: 330, y: 380}, {x: 170, y: 380}, {x: 120, y: 220}],
+                connections: [[0, 2], [0, 3], [1, 3], [1, 4], [2, 4], [0, 1], [3, 4]]
+            },
+            // Level 3: Star Maze (6 Nodes)
+            {
+                nodes: [{x: 250, y: 90}, {x: 390, y: 180}, {x: 370, y: 360}, {x: 250, y: 410}, {x: 130, y: 360}, {x: 110, y: 180}],
+                connections: [[0, 3], [1, 4], [2, 5], [0, 2], [1, 3], [2, 4], [3, 5], [4, 0]]
+            },
+            // Level 4: The Core Spider (8 Nodes)
+            {
+                nodes: [{x: 250, y: 70}, {x: 380, y: 140}, {x: 430, y: 280}, {x: 340, y: 400}, {x: 250, y: 430}, {x: 160, y: 400}, {x: 70, y: 280}, {x: 120, y: 140}],
+                connections: [[0,4], [1,5], [2,6], [3,7], [0,2], [2,4], [4,6], [6,0], [1,3], [3,5], [5,7], [7,1]]
+            }
+        ];
+
+        function loadLevel(index) {
+            if (index >= levels.length) {
+                alert("🎉 Spectacular! You have successfully untangled all wool levels!");
+                currentLevel = 0;
+                index = 0;
+            }
+            
+            levelDisplay.textContent = `LEVEL ${index + 1}`;
+            
+            // Deep copy coordinates to maintain standard defaults upon resets
+            nodes = levels[index].nodes.map(n => ({ x: n.x, y: n.y }));
+            connections = levels[index].connections.map(c => [...c]);
+            
+            updateIntersections();
+            draw();
+        }
+
+        // Geometry Math: Line segment Intersection calculation
+        function lineIntersect(p0, p1, p2, p3) {
+            // Check if line segments share endpoints
+            if (p0 === p2 || p0 === p3 || p1 === p2 || p1 === p3) return false;
+
+            let det, gamma, lambda;
+            det = (p1.x - p0.x) * (p3.y - p2.y) - (p3.x - p2.x) * (p1.y - p0.y);
+            if (det === 0) {
+                return false;
+            } else {
+                lambda = ((p3.y - p2.y) * (p3.x - p0.x) + (p2.x - p3.x) * (p3.y - p0.y)) / det;
+                gamma = ((p0.y - p1.y) * (p3.x - p0.x) + (p1.x - p0.x) * (p3.y - p0.y)) / det;
+                return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+            }
+        }
+
+        // Loop array to flag colliding paths
+        function updateIntersections() {
+            // Reset state markers
+            connections.forEach(c => c.isTangled = false);
+
+            for (let i = 0; i < connections.length; i++) {
+                for (let j = i + 1; j < connections.length; j++) {
+                    let line1 = connections[i];
+                    let line2 = connections[j];
+
+                    let p0 = nodes[line1[0]];
+                    let p1 = nodes[line1[1]];
+                    let p2 = nodes[line2[0]];
+                    let p3 = nodes[line2[1]];
+
+                    if (lineIntersect(p0, p1, p2, p3)) {
+                        line1.isTangled = true;
+                        line2.isTangled = true;
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw "Wool Strings" (Connections)
+            connections.forEach(conn => {
+                let p1 = nodes[conn[0]];
+                let p2 = nodes[conn[1]];
+
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                
+                if (conn.isTangled) {
+                    ctx.strokeStyle = '#ff4757';
+                    ctx.lineWidth = 4;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ff4757';
+                } else {
+                    ctx.strokeStyle = '#00ffcc';
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 4;
+                    ctx.shadowColor = '#00ffcc';
+                }
+                ctx.stroke();
+                // Reset shadow configuration for standard canvas render loops
+                ctx.shadowBlur = 0; 
+            });
+
+            // 2. Draw "Knitted Pins" (Nodes)
+            nodes.forEach(node => {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
+                ctx.fillStyle = '#9b59b6';
+                ctx.strokeStyle = '#f3f0ff';
+                ctx.lineWidth = 3;
+                ctx.fill();
+                ctx.stroke();
+
+                // Inner core center accent
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+            });
+        }
+
+        // Check puzzle victory condition
+        function checkWinCondition() {
+            let untangled = connections.every(c => !c.isTangled);
+            if (untangled) {
+                setTimeout(() => {
+                    alert("🌟 Level Completed! Threads are perfectly smooth.");
+                    currentLevel++;
+                    loadLevel(currentLevel);
+                }, 300);
+            }
+        }
+
+        // Event Intercept Tracking
+        function getMousePos(e) {
+            let rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            let pos = getMousePos(e);
+            // Search if a node was clicked
+            for (let i = 0; i < nodes.length; i++) {
+                let dist = Math.hypot(nodes[i].x - pos.x, nodes[i].y - pos.y);
+                if (dist < NODE_RADIUS + 5) {
+                    selectedNode = nodes[i];
+                    break;
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!selectedNode) return;
+            let pos = getMousePos(e);
+            
+            // Keep node updates inside bounding track walls
+            selectedNode.x = Math.max(NODE_RADIUS * 2, Math.min(canvas.width - NODE_RADIUS * 2, pos.x));
+            selectedNode.y = Math.max(NODE_RADIUS * 2, Math.min(canvas.height - NODE_RADIUS * 2, pos.y));
+            
+            updateIntersections();
+            draw();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (selectedNode) {
+                selectedNode = null;
+                checkWinCondition();
+            }
+        });
+
+        // Touch Device Implementations (Mobile Support)
+        canvas.addEventListener('touchstart', (e) => {
+            if(e.touches.length === 1) {
+                let touch = e.touches[0];
+                let mouseEvent = new MouseEvent("mousedown", {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }
+        }, {passive: true});
+
+        canvas.addEventListener('touchmove', (e) => {
+            if(e.touches.length === 1) {
+                let touch = e.touches[0];
+                let mouseEvent = new MouseEvent("mousemove", {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }
+        }, {passive: true});
+
+        window.addEventListener('touchend', () => {
+            let mouseEvent = new MouseEvent("mouseup", {});
+            window.dispatchEvent(mouseEvent);
+        });
+
+        resetBtn.addEventListener('click', () => loadLevel(currentLevel));
+
+        // Initializer Execution Line
+        loadLevel(currentLevel);
+    </script>
+</body>
+</html>
